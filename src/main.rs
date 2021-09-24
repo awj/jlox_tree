@@ -7,6 +7,8 @@ use std::io::{self, Write};
 use std::process::{exit};
 use std::result;
 
+mod token;
+
 #[derive(Debug)]
 struct ExecutionError {
     line: i32,
