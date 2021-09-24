@@ -2,7 +2,7 @@ use std::fmt;
 
 #[derive(Debug)]
 #[allow(dead_code)] // for now?
-enum TokenType {
+pub enum TokenType {
   // Single-character tokens.
   LeftParen, RightParen, LeftBrace, RightBrace,
   Comma, Dot, Minus, Plus, Semicolon, Slash, Star,
@@ -30,7 +30,7 @@ impl fmt::Display for TokenType {
 }
 
 #[derive(Debug)]
-enum Literal {
+pub enum Literal {
   None,
   Identifier(String),
   String(String),
@@ -43,11 +43,11 @@ impl fmt::Display for Literal {
   }
 }
 
-struct Token {
-  token_type: TokenType,
-  lexeme: String,
-  literal: Literal,
-  line: i32
+pub struct Token {
+  pub token_type: TokenType,
+  pub lexeme: String,
+  pub literal: Literal,
+  pub line: usize
 }
 
 impl fmt::Display for Token {

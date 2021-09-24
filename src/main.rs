@@ -8,15 +8,16 @@ use std::process::{exit};
 use std::result;
 
 mod token;
+mod scanner;
 
 #[derive(Debug)]
-struct ExecutionError {
-    line: i32,
-    location: String,
-    message: String,
+pub struct ExecutionError {
+    pub line: usize,
+    pub location: String,
+    pub message: String,
 }
 
-struct ExecutionSuccess {}
+pub struct ExecutionSuccess {}
 
 impl ExecutionError {
     fn report(&self) -> String {
