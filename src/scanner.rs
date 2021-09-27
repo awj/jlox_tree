@@ -77,61 +77,84 @@ impl Scanner {
         true
     }
 
-    fn nonliteral(&self, token_type: TokenType, tokens: &mut Vec<Token>) {
+    fn push_token(&self, token_type: TokenType, literal: Literal, tokens: &mut Vec<Token>) {
         tokens.push(
             Token {
                 token_type,
+                literal,
                 lexeme: self.extract_text().to_string(),
-                literal: Literal::None,
                 line: self.line
             }
         )
     }
 
-    fn string(&mut self) {}
+    fn scan_until(&mut self, terminator: char, subject: &str) -> bool {
+        while self.peek() != terminator && !self.at_end() {
+            if self.peek() == '\n' { self.line += 1 }
+            self.advance();
+        }
+
+        if self.at_end() {
+            self.errors.push(
+                ExecutionError { line: self.line, location: "".to_string(), message: format!("Unterminated {}", subject) }
+            );
+            return false;
+        }
+
+        // Capture closing character
+        self.advance();
+
+        true
+    }
+
+    fn string(&mut self, tokens: &mut Vec<Token>) {
+        if self.scan_until('"', "string") {
+
+        }
+    }
 
     fn scan_token(&mut self, tokens: &mut Vec<Token>) {
         let c = self.advance();
         match c {
-            '(' => self.nonliteral(TokenType::LeftParen, tokens),
-            ')' => self.nonliteral(TokenType::RightParen, tokens),
-            '{' => self.nonliteral(TokenType::LeftBrace, tokens),
-            '}' => self.nonliteral(TokenType::RightBrace, tokens),
-            ',' => self.nonliteral(TokenType::Comma, tokens),
-            '.' => self.nonliteral(TokenType::Dot, tokens),
-            '-' => self.nonliteral(TokenType::Minus, tokens),
-            '+' => self.nonliteral(TokenType::Plus, tokens),
-            ';' => self.nonliteral(TokenType::Semicolon, tokens),
-            '*' => self.nonliteral(TokenType::Star, tokens),
+            '(' => self.push_token(TokenType::LeftParen, Literal::None, tokens),
+            ')' => self.push_token(TokenType::RightParen, Literal::None, tokens),
+            '{' => self.push_token(TokenType::LeftBrace, Literal::None, tokens),
+            '}' => self.push_token(TokenType::RightBrace, Literal::None, tokens),
+            ',' => self.push_token(TokenType::Comma, Literal::None, tokens),
+            '.' => self.push_token(TokenType::Dot, Literal::None, tokens),
+            '-' => self.push_token(TokenType::Minus, Literal::None, tokens),
+            '+' => self.push_token(TokenType::Plus, Literal::None, tokens),
+            ';' => self.push_token(TokenType::Semicolon, Literal::None, tokens),
+            '*' => self.push_token(TokenType::Star, Literal::None, tokens),
             '!' => {
                 let token = if self.check('=') { TokenType::BangEqual } else { TokenType::Bang };
-                self.nonliteral(token, tokens)
+                self.push_token(token, Literal::None, tokens)
             },
             '=' => {
                 let token = if self.check('=') { TokenType::EqualEqual } else { TokenType::Equal };
-                self.nonliteral(token, tokens)
+                self.push_token(token, Literal::None, tokens)
             },
             '<' => {
                 let token = if self.check('=') { TokenType::LessEqual } else { TokenType::Less };
-                self.nonliteral(token, tokens)
+                self.push_token(token, Literal::None, tokens)
             },
             '>' => {
                 let token = if self.check('=') { TokenType::GreaterEqual } else { TokenType::Greater };
-                self.nonliteral(token, tokens)
+                self.push_token(token, Literal::None, tokens)
             },
             '/' => {
                 if self.check('/') {
                     // A comment goes until the end of the line.
                     while (self.peek() != '\n' && !self.at_end()) { self.advance(); }
                 } else {
-                    tokens.push(self.nonliteral_token(TokenType::Slash))
+                    self.push_token(TokenType::Slash, Literal::None, tokens);
                 }
             },
             '\n' => self.line += 1,
             ' ' | '\r' | '\t' => {
                 // Ignore whitespace
             },
-            '"' => self.string(),
+            '"' => self.string(tokens),
             _ => { self.errors.push(ExecutionError { line: self.line, location: "".to_string(), message: format!("Unexpected character: {}", c) }) }
         }
     }
