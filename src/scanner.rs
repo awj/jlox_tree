@@ -67,34 +67,47 @@ impl Scanner {
         true
     }
 
+    fn nonliteral(&self, token_type: TokenType, tokens: &mut Vec<Token>) {
+        tokens.push(
+            Token {
+                token_type,
+                lexeme: self.extract_text().to_string(),
+                literal: Literal::None,
+                line: self.line
+            }
+        )
+    }
+
+    fn string(&mut self) {}
+
     fn scan_token(&mut self, tokens: &mut Vec<Token>) {
         let c = self.advance();
         match c {
-            '(' => tokens.push(self.nonliteral_token(TokenType::LeftParen)),
-            ')' => tokens.push(self.nonliteral_token(TokenType::RightParen)),
-            '{' => tokens.push(self.nonliteral_token(TokenType::LeftBrace)),
-            '}' => tokens.push(self.nonliteral_token(TokenType::RightBrace)),
-            ',' => tokens.push(self.nonliteral_token(TokenType::Comma)),
-            '.' => tokens.push(self.nonliteral_token(TokenType::Dot)),
-            '-' => tokens.push(self.nonliteral_token(TokenType::Minus)),
-            '+' => tokens.push(self.nonliteral_token(TokenType::Plus)),
-            ';' => tokens.push(self.nonliteral_token(TokenType::Semicolon)),
-            '*' => tokens.push(self.nonliteral_token(TokenType::Star)),
+            '(' => self.nonliteral(TokenType::LeftParen, tokens),
+            ')' => self.nonliteral(TokenType::RightParen, tokens),
+            '{' => self.nonliteral(TokenType::LeftBrace, tokens),
+            '}' => self.nonliteral(TokenType::RightBrace, tokens),
+            ',' => self.nonliteral(TokenType::Comma, tokens),
+            '.' => self.nonliteral(TokenType::Dot, tokens),
+            '-' => self.nonliteral(TokenType::Minus, tokens),
+            '+' => self.nonliteral(TokenType::Plus, tokens),
+            ';' => self.nonliteral(TokenType::Semicolon, tokens),
+            '*' => self.nonliteral(TokenType::Star, tokens),
             '!' => {
                 let token = if self.check('=') { TokenType::BangEqual } else { TokenType::Bang };
-                tokens.push(self.nonliteral_token(token))
+                self.nonliteral(token, tokens)
             },
             '=' => {
                 let token = if self.check('=') { TokenType::EqualEqual } else { TokenType::Equal };
-                tokens.push(self.nonliteral_token(token))
+                self.nonliteral(token, tokens)
             },
             '<' => {
                 let token = if self.check('=') { TokenType::LessEqual } else { TokenType::Less };
-                tokens.push(self.nonliteral_token(token))
+                self.nonliteral(token, tokens)
             },
             '>' => {
                 let token = if self.check('=') { TokenType::GreaterEqual } else { TokenType::Greater };
-                tokens.push(self.nonliteral_token(token))
+                self.nonliteral(token, tokens)
             },
             '/' => {
                 if self.check('/') {
