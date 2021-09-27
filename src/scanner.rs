@@ -109,7 +109,15 @@ impl Scanner {
 
     fn string(&mut self, tokens: &mut Vec<Token>) {
         if self.scan_until('"', "string") {
-
+            let start = self.start + 1;
+            let finish = self.current - 1;
+            let content = self.source.get(start..finish).unwrap();
+            let literal = Literal::String(content.to_string());
+            self.push_token(
+                TokenType::String,
+                literal,
+                tokens
+            )
         }
     }
 
