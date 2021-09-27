@@ -1,16 +1,26 @@
 use crate::{ExecutionError};
 use crate::token::{self, Literal, Token, TokenType};
 
-struct Scanner {
+pub struct Scanner {
     source: String,
     start: usize,
     current: usize,
     line: usize,
-    errors: Vec<ExecutionError>,
+    pub errors: Vec<ExecutionError>,
 }
 
 impl Scanner {
-    fn scan(&mut self) -> Vec<Token> {
+    pub fn new(source: String) -> Scanner {
+        Scanner {
+            source,
+            start: 0,
+            current: 0,
+            line: 1,
+            errors: Vec::new()
+        }
+    }
+
+    pub fn scan(&mut self) -> Vec<Token> {
         let mut vec = Vec::new();
 
         while(!self.at_end()) {

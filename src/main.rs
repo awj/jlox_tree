@@ -10,6 +10,8 @@ use std::result;
 mod token;
 mod scanner;
 
+use crate::scanner::Scanner;
+
 #[derive(Debug)]
 pub struct ExecutionError {
     pub line: usize,
@@ -36,7 +38,12 @@ impl Error for ExecutionError {
 
 type ExecutionResult = Result<ExecutionSuccess, ExecutionError>;
 
-fn run(_script: &str) -> ExecutionResult {
+fn run(script: &str) -> ExecutionResult {
+    let mut scanner = Scanner::new(script.to_string());
+    let tokens = scanner.scan();
+
+    println!("tokens: {:?}", tokens);
+    println!("errors: {:?}", scanner.errors);
     Ok(ExecutionSuccess {})
 }
 
