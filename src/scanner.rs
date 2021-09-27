@@ -39,8 +39,8 @@ impl Scanner {
     }
 
     fn extract_text(&self) -> &str {
-        let finish = self.start + self.current;
-        self.source.get(self.start..finish).unwrap()
+        println!("extracting start: {}, finish: {}", self.start, self.current);
+        self.source.get(self.start..self.current).unwrap()
     }
 
     fn advance(&mut self) -> char {
