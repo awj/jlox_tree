@@ -108,6 +108,7 @@ impl Scanner {
             ' ' | '\r' | '\t' => {
                 // Ignore whitespace
             },
+            '"' => self.string(),
             _ => { self.errors.push(ExecutionError { line: self.line, location: "".to_string(), message: format!("Unexpected character: {}", c) }) }
         }
     }
