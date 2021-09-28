@@ -1,6 +1,8 @@
 use std::fmt;
+use lazy_static::lazy_static;
+use std::collections::HashMap;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 #[allow(dead_code)] // for now?
 pub enum TokenType {
   // Single-character tokens.
@@ -42,6 +44,35 @@ impl fmt::Display for Literal {
     write!(f, "{:?}", self)
   }
 }
+
+lazy_static! {
+  static ref KEYWORDS: HashMap<&'static str, TokenType> = {
+    let mut map = HashMap::new();
+
+    map.insert("and", TokenType::And);
+    map.insert("class", TokenType::Class);
+    map.insert("else", TokenType::Else);
+    map.insert("false", TokenType::False);
+    map.insert("for", TokenType::For);
+    map.insert("fun", TokenType::Fun);
+    map.insert("if", TokenType::If);
+    map.insert("nil", TokenType::Nil);
+    map.insert("or", TokenType::Or);
+    map.insert("print", TokenType::Print);
+    map.insert("return", TokenType::Return);
+    map.insert("super", TokenType::Super);
+    map.insert("this", TokenType::This);
+    map.insert("true", TokenType::True);
+    map.insert("var", TokenType::Var);
+    map.insert("while", TokenType::While);
+    map
+  };
+}
+
+pub fn keyword(identifier: &str) -> Option<TokenType> {
+  KEYWORDS.get(identifier).and_then(|val| { Some(val.clone()) })
+}
+
 
 #[derive(Debug)]
 pub struct Token {
