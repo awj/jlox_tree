@@ -60,7 +60,7 @@ impl Scanner {
         c
     }
 
-    fn peek(&mut self) -> char {
+    fn peek(&self) -> char {
         if self.at_end() { return '\0' }
 
         self.source.chars().nth(self.current).unwrap()
@@ -121,6 +121,57 @@ impl Scanner {
         }
     }
 
+    fn is_digit(&self, c: char) -> bool {
+        match c {
+            '0'..='9' => true,
+            _ => false
+        }
+    }
+
+    fn is_alpha(&self, c: char) -> bool {
+        match c {
+            'a'..='z' => true,
+            'A'..='Z' => true,
+            '_' => true,
+            _ => false
+        }
+    }
+
+    fn is_alphanum(&self, c: char) -> bool {
+        self.is_alpha(c) || self.is_digit(c)
+    }
+
+    fn peek_next(&self) -> char {
+        self.source.chars().nth(self.current + 1).unwrap_or('\0')
+    }
+
+    fn number(&mut self, tokens: &mut Vec<Token>) {
+        while self.is_digit(self.peek()) { self.advance(); }
+
+        if self.peek() == '.' && self.is_digit(self.peek_next()) {
+            // Consume the '.'
+            self.advance();
+
+            while self.is_digit(self.peek()) { self.advance(); }
+        }
+
+        let content = self.extract_text();
+        let num = content.parse().unwrap();
+        let literal = Literal::Number(num);
+        self.push_token(TokenType::Number,literal, tokens);
+    }
+
+    fn identifier(&mut self, tokens: &mut Vec<Token>) {
+        while self.is_alphanum(self.peek()) { self.advance(); }
+
+        let identifier = self.extract_text();
+
+        // if it's not a listed keyword, it's a regular identifier
+        let type_tag = token::keyword(identifier).unwrap_or(TokenType::Identifier);
+
+        self.push_token(type_tag, Literal::Identifier(identifier.to_string()), tokens)
+    }
+
     fn scan_token(&mut self, tokens: &mut Vec<Token>) {
         let c = self.advance();
         match c {
@@ -163,6 +214,8 @@ impl Scanner {
                 // Ignore whitespace
             },
             '"' => self.string(tokens),
+            '0'..='9' => self.number(tokens),
+            c if self.is_alpha(c) => self.identifier(tokens),
             _ => { self.errors.push(ExecutionError { line: self.line, location: "".to_string(), message: format!("Unexpected character: {}", c) }) }
         }
     }
