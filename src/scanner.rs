@@ -23,7 +23,7 @@ impl Scanner {
     pub fn scan(&mut self) -> Vec<Token> {
         let mut vec = Vec::new();
 
-        while(!self.at_end()) {
+        while !self.at_end() {
             self.start = self.current;
             self.scan_token(&mut vec);
         }
@@ -204,7 +204,7 @@ impl Scanner {
             '/' => {
                 if self.check('/') {
                     // A comment goes until the end of the line.
-                    while (self.peek() != '\n' && !self.at_end()) { self.advance(); }
+                    while self.peek() != '\n' && !self.at_end() { self.advance(); }
                 } else {
                     self.push_token(TokenType::Slash, Literal::None, tokens);
                 }
