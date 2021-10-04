@@ -5,10 +5,10 @@ use std::format;
 use std::fs;
 use std::io::{self, Write};
 use std::process::{exit};
-use std::result;
 
 mod token;
 mod scanner;
+mod grammar;
 
 use crate::scanner::Scanner;
 
