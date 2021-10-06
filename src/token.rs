@@ -39,6 +39,17 @@ pub enum Literal {
   Number(f32)
 }
 
+impl Literal {
+  pub fn to_s(&self) -> String {
+    match self {
+      Literal::None => "nil".to_string(),
+      Literal::Identifier(s) => s.to_string(),
+      Literal::String(s) => s.to_string(),
+      Literal::Number(n) => format!("{}", n)
+    }
+  }
+}
+
 impl fmt::Display for Literal {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     write!(f, "{:?}", self)
