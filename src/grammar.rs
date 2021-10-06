@@ -1,65 +1,33 @@
 use crate::token;
 
-pub trait Expr {}
-
-pub struct Binary<'a> {
-    left: &'a dyn Expr,
-    operator: token::Token,
-    right: &'a dyn Expr,
+pub trait Visitor<'a, X: 'a> {
+    fn visit(&mut self, expr: &'a Expr) -> X;
 }
 
-impl Expr for Binary<'_> {}
+pub struct AstPrinter {}
 
-impl<'a> Binary<'a> {
-    pub fn new(left: &'a dyn Expr, operator: token::Token, right: &'a dyn Expr) -> Binary<'a> {
-        Binary {
-            left,
-            operator,
-            right
+impl<'a> Visitor<'a, String> for AstPrinter {
+    fn visit(&mut self, expr: &'a Expr) -> String {
+        match expr {
+            Expr::Binary{left, operator, right} => {
+                format!("({} {} {})", operator.lexeme, self.visit(left), self.visit(right))
+            },
+            Expr::Grouping{expression} => {
+                format!("(group {})", self.visit(expression))
+            },
+            Expr::Literal{value} => {
+                value.to_s()
+            },
+            Expr::Unary{operator, right} => {
+                format!("({} {})", operator.lexeme, self.visit(right))
+            }
         }
     }
 }
 
-pub struct Grouping<'a> {
-    expression: &'a dyn Expr
+pub enum Expr<'a> {
+    Binary { left: &'a Expr<'a>, operator: token::Token, right: &'a Expr<'a> },
+    Grouping { expression: &'a Expr<'a> },
+    Literal { value: &'a token::Literal },
+    Unary { operator: &'a token::Token, right: &'a Expr<'a> }
 }
-
-impl<'a> Grouping<'a> {
-    pub fn new(expression: &'a dyn Expr) -> Grouping<'a> {
-        Grouping {
-            expression
-        }
-    }
-}
-
-impl Expr for Grouping<'_> {}
-
-pub struct Literal<'a> {
-    value: &'a token::Literal
-}
-
-impl<'a> Literal<'a> {
-    pub fn new(value: &'a token::Literal) -> Literal<'a> {
-        Literal {
-            value
-        }
-    }
-}
-
-impl Expr for Literal<'_> {}
-
-pub struct Unary<'a> {
-    operator: &'a token::Token,
-    right: &'a dyn Expr
-}
-
-impl<'a> Unary<'a> {
-    pub fn new(operator: &'a token::Token, right: &'a dyn Expr) -> Unary<'a> {
-        Unary {
-            operator,
-            right
-        }
-    }
-}
-
-impl Expr for Unary<'_> {}

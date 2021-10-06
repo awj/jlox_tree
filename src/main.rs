@@ -11,6 +11,7 @@ mod scanner;
 mod grammar;
 
 use crate::scanner::Scanner;
+use crate::grammar::Visitor;
 
 #[derive(Debug)]
 pub struct ExecutionError {
@@ -75,6 +76,37 @@ fn run_prompt() {
 }
 
 fn main() {
+    // let first: grammar::Expr = grammar::Expr::Unary {
+    //     operator: &token::Token {
+    //         token_type: token::TokenType::Minus,
+    //         lexeme: "-".to_string(),
+    //         literal: token::Literal::None,
+    //         line: 1
+    //     },
+    //     right: &grammar::Expr::Literal {
+    //         value: &token::Literal::Number(123.0)
+    //     },
+    // };
+
+    // let expr: grammar::Expr = grammar::Expr::Binary {
+    //     left: &first,
+    //     operator: token::Token {
+    //         token_type: token::TokenType::Star,
+    //         lexeme: "*".to_string(),
+    //         literal: token::Literal::None,
+    //         line: 1
+    //     },
+    //     right: &grammar::Expr::Grouping {
+    //         expression: &grammar::Expr::Literal {
+    //             value: &token::Literal::Number(45.67)
+    //         }
+    //     }
+    // };
+
+    // let mut printer: grammar::AstPrinter = grammar::AstPrinter {};
+
+    // println!("{}", printer.visit(&expr));
+
     let args: Vec<String> = env::args().collect();
     println!("args {:?}", args);
 
